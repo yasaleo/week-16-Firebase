@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_week_16/Screens/home_page.dart';
 import 'package:firebase_week_16/Screens/authentication_page/signin_page.dart';
@@ -8,12 +6,23 @@ import 'package:flutter/material.dart';
 import '../../widgets/custom_inputfeild.dart';
 import '../../widgets/headline.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final formkey = GlobalKey<FormState>();
+
   final auth = FirebaseAuth.instance;
+
   final TextEditingController email = TextEditingController();
+
   final TextEditingController password = TextEditingController();
+
+  bool isloading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -115,23 +124,29 @@ class LoginPage extends StatelessWidget {
                 const Spacer(
                   flex: 5,
                 ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    minimumSize: const Size(double.infinity, 40),
-                  ),
-                  onPressed: () {
-                    logIn(email.text.trim(), password.text.trim(), context);
-                  },
-                  child: const Text(
-                    'Login ',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+                isloading == true
+                    ? const CircularProgressIndicator(
+                        color: Colors.black,
+                        strokeWidth: 5,
+                      )
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          minimumSize: const Size(double.infinity, 40),
+                        ),
+                        onPressed: () {
+                          logIn(
+                              email.text.trim(), password.text.trim(), context);
+                        },
+                        child: const Text(
+                          'Login ',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
               ],
             ),
           ),
@@ -142,6 +157,9 @@ class LoginPage extends StatelessWidget {
 
   void logIn(String email, String password, BuildContext context) async {
     if (formkey.currentState!.validate()) {
+      setState(() {
+        isloading = true;
+      });
       await auth
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) => {
@@ -156,34 +174,37 @@ class LoginPage extends StatelessWidget {
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
-                      
                     ),
                   ),
                 ),
+                isloading = false,
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) =>  Homepage(),
+                    builder: (context) => const Homepage(),
                   ),
                 )
               })
-          .catchError((e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            dismissDirection: DismissDirection.horizontal,
-            content: Text(
-              e.toString(),
-              style: const TextStyle(color: Colors.white),
+          .catchError(
+        (e) {
+          isloading = false;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              dismissDirection: DismissDirection.horizontal,
+              content: Text(
+                e.toString(),
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.black,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: const BorderSide(color: Colors.red, width: 2.5),
+              ),
+              margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 15),
             ),
-            backgroundColor: Colors.black,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-              side: const BorderSide(color: Colors.red, width: 2.5),
-            ),
-            margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 15),
-          ),
-        );
-      });
+          );
+        },
+      );
     }
   }
 }

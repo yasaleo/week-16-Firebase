@@ -1,20 +1,37 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_week_16/widgets/constants.dart';
 import 'package:firebase_week_16/widgets/custom_inputfeild.dart';
 import 'package:firebase_week_16/widgets/headline.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
   SignInPage({super.key});
+
+  @override
+  State<SignInPage> createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
   final auth = FirebaseAuth.instance;
 
   final formkey = GlobalKey<FormState>();
+
   final TextEditingController email = TextEditingController();
+
   final TextEditingController password = TextEditingController();
+
   final TextEditingController confirmpassword = TextEditingController();
-  final TextEditingController name = TextEditingController();
+
+  // final TextEditingController name = TextEditingController();
+
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  File? image;
+  // final userid = FirebaseAuth.instance.currentUser!.email.toString();
 
   @override
   Widget build(BuildContext context) {
@@ -34,19 +51,27 @@ class SignInPage extends StatelessWidget {
                     endindent: 83,
                   ),
                   cheight30,
-                  CustomInputFeild(
-                    controller: name,
-                    hint: "Name",
-                    obscureText: false,
-                    widget: const Icon(Icons.person_outline_outlined),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'please enter a your Name 🧑';
-                      }
-
-                      return null;
-                    },
-                  ),
+                  image == null
+                      ? GestureDetector(
+                          onTap: () {
+                            pickimage();
+                            
+                          },
+                          child: const CircleAvatar(
+                            maxRadius: 70,
+                            backgroundColor: Colors.black,
+                            child: Icon(
+                              Icons.person_add,
+                              color: Colors.white,
+                              size: 60,
+                            ),
+                          ),
+                        )
+                      : CircleAvatar(
+                          maxRadius: 70,
+                          backgroundImage: FileImage(image!),
+                        ),
+                  cheight30,
                   cheight20,
                   CustomInputFeild(
                     controller: email,
@@ -109,6 +134,7 @@ class SignInPage extends StatelessWidget {
                     onPressed: () {
                       registeruser(
                           email.text.trim(), password.text.trim(), context);
+                          uploadimage(email.text.trim());
                     },
                     child: const Text(
                       'Sign in ',
@@ -136,7 +162,6 @@ class SignInPage extends StatelessWidget {
             password: password,
           )
           .then((value) => {
-
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     dismissDirection: DismissDirection.horizontal,
@@ -172,5 +197,22 @@ class SignInPage extends StatelessWidget {
         );
       });
     }
+  }
+
+  Future pickimage() async {
+    final imagepath =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (imagepath == null) {
+      return;
+    } else {
+      final img = File(imagepath.path);
+      setState(() {
+        image = img;
+      });
+    }
+  }
+
+  Future uploadimage(String? userid) async {
+    FirebaseStorage.instance.ref().child('$userid/images').putFile(image!);
   }
 }

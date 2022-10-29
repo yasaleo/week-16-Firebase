@@ -6,14 +6,17 @@ class CustomAppBar extends StatelessWidget {
     required this.title,
     required this.widget,
     this.islead = false,
+    this.leading
   }) : super(key: key);
   final String title;
   final Widget widget;
   final bool islead;
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      leading: leading,
       automaticallyImplyLeading: islead,
       centerTitle: true,
       title: Padding(
