@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_week_16/Screens/authentication_page/login_page.dart';
 import 'package:firebase_week_16/Screens/home_page.dart';
@@ -52,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(milliseconds: 900));
     if (FirebaseAuth.instance.currentUser == null) {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => LoginPage(),
+        builder: (context) => const LoginPage(),
       ));
     } else {
       Navigator.of(context).pushReplacement(MaterialPageRoute(

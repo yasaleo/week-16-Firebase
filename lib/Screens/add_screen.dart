@@ -1,25 +1,19 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, must_be_immutable
 
-
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_week_16/personmodel/model.dart';
-import 'package:firebase_week_16/widgets/constants.dart';
+import 'package:firebase_week_16/firebse/firebase_ops.dart';
 import 'package:firebase_week_16/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
 
 import '../widgets/custom_inputfeild.dart';
 
 class AddScreen extends StatefulWidget {
-  AddScreen({super.key, this.name, this.age, this.address, this.uid});
+   AddScreen({super.key, this.name, this.age, this.address, this.uid});
 
-  String? name;
-  int? age;
-  String? address;
-  String? uid;
+   String? name;
+  final int? age;
+  final String? address;
+  final String? uid;
 
   @override
   State<AddScreen> createState() => _AddScreenState();
@@ -33,7 +27,6 @@ class _AddScreenState extends State<AddScreen> {
   final TextEditingController address = TextEditingController();
 
   final auth = FirebaseAuth.instance;
-
 
   @override
   void initState() {
@@ -58,8 +51,19 @@ class _AddScreenState extends State<AddScreen> {
           widget: TextButton(
             onPressed: () {
               widget.uid == null
-                  ? uploadperson(context)
-                  : updateperson(context);
+                  ? FirebaseOperations().uploadperson(
+                      context: context,
+                      address: address.text,
+                      age: age.text,
+                      name: name.text,
+                    )
+                  : FirebaseOperations().updateperson(
+                      context: context,
+                      address: address.text,
+                      age: age.text,
+                      name: name.text,
+                      uid: widget.uid!,
+                    );
             },
             child: const Text(
               "👍 Submit",
@@ -77,7 +81,6 @@ class _AddScreenState extends State<AddScreen> {
             padding: const EdgeInsets.all(10.0),
             child: Column(
               children: [
-                
                 CustomInputFeild(
                   controller: name,
                   labell: const Text(
@@ -137,59 +140,5 @@ class _AddScreenState extends State<AddScreen> {
     );
   }
 
-  void uploadperson(BuildContext context) async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    String uid = const Uuid().v4();
 
-    PersonModel person = PersonModel();
-    int agee = int.parse(age.text);
-
-    person.name = name.text.trim();
-    person.age = agee;
-    person.uid = uid;
-    person.address = address.text;
-    await firestore
-        .collection(
-          auth.currentUser!.email.toString(),
-        )
-        .doc(uid)
-        .set(
-          person.toMap(),
-        );
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        dismissDirection: DismissDirection.horizontal,
-        content: const Text(
-          'Added SucessFully 🥳',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.black,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-  }
-
-  void updateperson(BuildContext context) async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    PersonModel updateper = PersonModel();
-    updateper.name = name.text;
-    updateper.address = address.text;
-    updateper.age = int.parse(age.text);
-    updateper.uid = widget.uid;
-
-    await firestore
-        .collection(
-          auth.currentUser!.email.toString(),
-        )
-        .doc(widget.uid)
-        .update(updateper.toMap());
-    Navigator.of(context).pop();
-  }
-
-
- 
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SignInPage extends StatefulWidget {
-  SignInPage({super.key});
+ const SignInPage({super.key});
 
   @override
   State<SignInPage> createState() => _SignInPageState();
@@ -55,7 +57,6 @@ class _SignInPageState extends State<SignInPage> {
                       ? GestureDetector(
                           onTap: () {
                             pickimage();
-                            
                           },
                           child: const CircleAvatar(
                             maxRadius: 70,
@@ -132,9 +133,9 @@ class _SignInPageState extends State<SignInPage> {
                       minimumSize: const Size(double.infinity, 40),
                     ),
                     onPressed: () {
-                      registeruser(
-                          email.text.trim(), password.text.trim(), context);
-                          uploadimage(email.text.trim());
+                      registeruser(email.text.trim(), password.text.trim(),
+                          context, email.text);
+                      // uploadimage(email.text);
                     },
                     child: const Text(
                       'Sign in ',
@@ -154,33 +155,41 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  void registeruser(String email, String password, BuildContext context) async {
+  void registeruser(String email, String password, BuildContext context,
+      String? userid) async {
     if (formkey.currentState!.validate()) {
+      loading(context);
       await auth
           .createUserWithEmailAndPassword(
-            email: email,
-            password: password,
-          )
-          .then((value) => {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    dismissDirection: DismissDirection.horizontal,
-                    content: const Text(
-                      'Created Successfully  🥳 🙋',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: Colors.black,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 40, horizontal: 15),
-                  ),
-                ),
-                Navigator.of(context).pop()
-              })
-          .catchError((e) {
+        email: email,
+        password: password,
+      )
+          .then((value) async {
+        if (image != null) {
+          await FirebaseStorage.instance
+              .ref()
+              .child('$userid/images')
+              .putFile(image!);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            dismissDirection: DismissDirection.horizontal,
+            content: const Text(
+              'Created Successfully  🥳 🙋',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.black,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 15),
+          ),
+        );
+        Navigator.of(context)
+          ..pop()
+          ..pop();
+      }).catchError((e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             dismissDirection: DismissDirection.horizontal,
@@ -213,6 +222,9 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Future uploadimage(String? userid) async {
-    FirebaseStorage.instance.ref().child('$userid/images').putFile(image!);
+    await FirebaseStorage.instance
+        .ref()
+        .child('$userid/images')
+        .putFile(image!);
   }
 }

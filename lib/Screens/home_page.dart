@@ -1,13 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_week_16/Screens/authentication_page/login_page.dart';
+import 'package:firebase_week_16/firebse/firebase_ops.dart';
 import 'package:firebase_week_16/personmodel/model.dart';
 import 'package:firebase_week_16/widgets/constants.dart';
 
 import 'package:flutter/material.dart';
 
 import '../widgets/custom_appbar.dart';
+import '../widgets/show_snackbar.dart';
 import 'add_screen.dart';
 
 class Homepage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _HomepageState extends State<Homepage> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
                         child: Container(
-                          height: 320,
+                          height: 340,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                               color: Colors.white,
@@ -62,25 +63,30 @@ class _HomepageState extends State<Homepage> {
                                       ),
                                     )
                                   : CircleAvatar(
-                                    maxRadius: 55,
-                                    backgroundColor: Colors.black,
-                                    child: CircleAvatar(
+                                      maxRadius: 55,
+                                      backgroundColor: Colors.black,
+                                      child: CircleAvatar(
                                         maxRadius: 50,
                                         backgroundColor: Colors.black,
                                         backgroundImage:
                                             NetworkImage(downloadurl!),
                                       ),
-                                  ),
+                                    ),
                               cheight20,
                               const Text(
                                 "Signed in as",
                                 style: TextStyle(fontSize: 20),
                               ),
                               cheight10,
-                              Text(
-                                auth.currentUser!.email.toString(),
-                                style: const TextStyle(
-                                    fontSize: 27, fontWeight: FontWeight.w700),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  maxLines: 2,
+                                  auth.currentUser!.email.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 27,
+                                      fontWeight: FontWeight.w700),
+                                ),
                               ),
                               cheight30,
                               ElevatedButton.icon(
@@ -130,7 +136,7 @@ class _HomepageState extends State<Homepage> {
         ),
         body: SafeArea(
             child: StreamBuilder<List<PersonModel>>(
-          stream: readpersons(),
+          stream: FirebaseOperations().readpersons(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               final person = snapshot.requireData;
@@ -145,46 +151,63 @@ class _HomepageState extends State<Homepage> {
                       ),
                     )
                   : Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: ListView.separated(
-                        itemBuilder: (context, index) {
-                          return Card(
-                            margin: const EdgeInsets.only(right: 10,left: 10,bottom: 3),
-                            elevation: 10,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                            child: ListTile(
-                              title: Text(person[index].name.toString()),
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => AddScreen(
-                                    address: person[index].address,
-                                    name: person[index].name,
-                                    age: person[index].age,
-                                    uid: person[index].uid,
-                                  ),
-                                ));
-                              },
-                              trailing: IconButton(
-                                onPressed: () {
-                                  deleteperson(person[index].uid);
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      child: ListView.separated(
+                          itemBuilder: (context, index) {
+                            return Card(
+                              margin: const EdgeInsets.only(
+                                  right: 10, left: 10, bottom: 3),
+                              elevation: 10,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: ListTile(
+                                leading: const Text(
+                                  'Name :',
+                                  style: TextStyle(fontSize: 19.9),
+                                ),
+                                title: Text(
+                                  person[index].name.toString(),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 22),
+                                ),
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => AddScreen(
+                                      address: person[index].address,
+                                      name: person[index].name,
+                                      age: person[index].age,
+                                      uid: person[index].uid,
+                                    ),
+                                  ));
                                 },
-                                icon: const Icon(Icons.delete_forever_outlined),
-                                color: Colors.red,
+                                trailing: IconButton(
+                                  onPressed: () {
+                               
+
+                                    FirebaseOperations().deleteperson(
+                                        uid: person[index].uid,
+                                        context: context);
+                                        ShowSnackbar(
+                                        context: context, msg: "Deleted 👋 🪦");
+                                  },
+                                  icon:
+                                      const Icon(Icons.delete_forever_outlined),
+                                  color: Colors.red,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        separatorBuilder: (context, index) {
-                          return const Divider(
-                            color: Colors.black,
-                            thickness: 2,
-                            indent: 30,
-                            endIndent: 30,
-                          );
-                        },
-                        itemCount: person.length),
-                  );
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return const Divider(
+                              color: Colors.black45,
+                              thickness: 2,
+                              indent: 30,
+                              endIndent: 30,
+                            );
+                          },
+                          itemCount: person.length),
+                    );
             } else {
               return const Center(
                 child: CircularProgressIndicator(
@@ -197,12 +220,6 @@ class _HomepageState extends State<Homepage> {
         )));
   }
 
-  Stream<List<PersonModel>> readpersons() => FirebaseFirestore.instance
-      .collection(auth.currentUser!.email.toString())
-      .snapshots()
-      .map((event) =>
-          event.docs.map((doc) => PersonModel.fromMap(doc.data())).toList());
-
   Future getimage(String? userid) async {
     final urll = await FirebaseStorage.instance
         .ref()
@@ -211,10 +228,5 @@ class _HomepageState extends State<Homepage> {
     downloadurl = urll;
   }
 
-  Future deleteperson(String? uid) async {
-    await FirebaseFirestore.instance
-        .collection(auth.currentUser!.email.toString())
-        .doc(uid)
-        .delete();
-  }
+
 }

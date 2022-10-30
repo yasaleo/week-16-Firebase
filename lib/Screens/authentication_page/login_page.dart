@@ -106,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => SignInPage(),
+                            builder: (context) => const SignInPage(),
                           ),
                         );
                       },
@@ -125,9 +125,12 @@ class _LoginPageState extends State<LoginPage> {
                   flex: 5,
                 ),
                 isloading == true
-                    ? const CircularProgressIndicator(
-                        color: Colors.black,
-                        strokeWidth: 5,
+                    ? const Padding(
+                        padding: EdgeInsets.only(bottom: 20),
+                        child: CircularProgressIndicator(
+                          color: Colors.black,
+                          strokeWidth: 5,
+                        ),
                       )
                     : ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -178,7 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 isloading = false,
-                Navigator.of(context).push(
+                Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => const Homepage(),
                   ),
@@ -186,7 +189,9 @@ class _LoginPageState extends State<LoginPage> {
               })
           .catchError(
         (e) {
-          isloading = false;
+          setState(() {
+            isloading = false;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               dismissDirection: DismissDirection.horizontal,
