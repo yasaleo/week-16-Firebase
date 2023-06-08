@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({
-    Key? key,
-    required this.title,
-    required this.widget,
-    this.islead = false,
-    this.leading
-  }) : super(key: key);
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const CustomAppBar(
+      {Key? key,
+      required this.title,
+       this.widget ,
+      this.islead = false,
+      this.leading})
+      : super(key: key);
   final String title;
-  final Widget widget;
+  final Widget? widget;
   final bool islead;
   final Widget? leading;
 
@@ -30,16 +30,21 @@ class CustomAppBar extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(18),
           bottomRight: Radius.circular(18),
         ),
       ),
+      
       actions: [
-        widget,
+        widget??const SizedBox.shrink(),
       ],
     );
   }
+  
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => const Size(double.infinity, 80);
 }

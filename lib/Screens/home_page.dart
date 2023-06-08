@@ -1,15 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_week_16/Screens/authentication_page/login_page.dart';
+
 import 'package:firebase_week_16/firebse/firebase_ops.dart';
-import 'package:firebase_week_16/personmodel/model.dart';
-import 'package:firebase_week_16/widgets/constants.dart';
+import 'package:firebase_week_16/model/model.dart';
+import 'package:firebase_week_16/widgets/custom_drawer.dart';
 
 import 'package:flutter/material.dart';
-
 import '../widgets/custom_appbar.dart';
 import '../widgets/show_snackbar.dart';
 import 'add_screen.dart';
+import 'authentication_page/login_page.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -28,111 +28,45 @@ class _HomepageState extends State<Homepage> {
     super.initState();
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size(double.infinity, 80),
-          child: CustomAppBar(
+        drawer: const CustomDrawer(),
+        key: _scaffoldKey,
+        appBar: CustomAppBar(
             leading: IconButton(
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        child: Container(
-                          height: 340,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Colors.white,
-                              border:
-                                  Border.all(color: Colors.black, width: 5)),
-                          child: Column(
-                            children: [
-                              cheight20,
-                              downloadurl == null
-                                  ? const CircleAvatar(
-                                      maxRadius: 40,
-                                      backgroundColor: Colors.black,
-                                      child: Icon(
-                                        Icons.person,
-                                        color: Colors.white,
-                                        size: 60,
-                                      ),
-                                    )
-                                  : CircleAvatar(
-                                      maxRadius: 55,
-                                      backgroundColor: Colors.black,
-                                      child: CircleAvatar(
-                                        maxRadius: 50,
-                                        backgroundColor: Colors.black,
-                                        backgroundImage:
-                                            NetworkImage(downloadurl!),
-                                      ),
-                                    ),
-                              cheight20,
-                              const Text(
-                                "Signed in as",
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              cheight10,
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  maxLines: 2,
-                                  auth.currentUser!.email.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 27,
-                                      fontWeight: FontWeight.w700),
-                                ),
-                              ),
-                              cheight30,
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  FirebaseAuth.instance.signOut();
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                        builder: (context) => const LoginPage(),
-                                      ),
-                                      (route) => false);
-                                },
-                                icon: const Icon(Icons.logout_rounded),
-                                label: const Text(
-                                  'Logout',
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.black),
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
+                  _scaffoldKey.currentState?.openDrawer();
                 },
-                icon: const Icon(Icons.person)),
+                icon: const Icon(Icons.menu)),
             title: "Home ",
-            widget: TextButton(
+            widget: MaterialButton(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => AddScreen(),
-                  ),
-                );
+                FirebaseAuth.instance.signOut();
+                Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const LoginPage(),
+                    ),
+                    (route) => false);
               },
-              child: const Text(
-                " 👉 Add ",
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
+              child: Row(
+                children: [
+                  const Icon(Icons.logout_rounded),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    "LogOut",
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  )
+                ],
               ),
-            ),
-          ),
+            )),
+        endDrawer: Container(
+          height: 300,
+          width: 300,
+          color: Colors.white,
         ),
         body: SafeArea(
             child: StreamBuilder<List<PersonModel>>(
@@ -141,13 +75,10 @@ class _HomepageState extends State<Homepage> {
             if (snapshot.hasData) {
               final person = snapshot.requireData;
               return person.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        "No Persons Added 😓",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w600),
+                        "Nothing to see here 😓",
+                        style: Theme.of(context).textTheme.displaySmall,
                       ),
                     )
                   : Padding(
@@ -183,12 +114,10 @@ class _HomepageState extends State<Homepage> {
                                 },
                                 trailing: IconButton(
                                   onPressed: () {
-                               
-
                                     FirebaseOperations().deleteperson(
                                         uid: person[index].uid,
                                         context: context);
-                                        ShowSnackbar(
+                                    ShowSnackbar(
                                         context: context, msg: "Deleted 👋 🪦");
                                   },
                                   icon:
@@ -209,10 +138,10 @@ class _HomepageState extends State<Homepage> {
                           itemCount: person.length),
                     );
             } else {
-              return const Center(
+              return Center(
                 child: CircularProgressIndicator(
-                  color: Colors.black,
-                  strokeWidth: 5,
+                  color: Theme.of(context).colorScheme.inverseSurface,
+                  strokeWidth: 10,
                 ),
               );
             }
@@ -227,6 +156,4 @@ class _HomepageState extends State<Homepage> {
         .getDownloadURL();
     downloadurl = urll;
   }
-
-
 }

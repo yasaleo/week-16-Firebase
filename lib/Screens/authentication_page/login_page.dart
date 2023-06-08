@@ -85,42 +85,37 @@ class _LoginPageState extends State<LoginPage> {
                 const Spacer(
                   flex: 1,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Don't have a account yet! 🤷,  ",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                          maximumSize: const Size(70, 29),
-                          minimumSize: const Size(70, 29),
-                          side: const BorderSide(
-                            color: Colors.black,
-                            width: 2.5,
-                          )),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const SignInPage(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        'Sign in',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     Text("Don't have a account yet! 🤷,  ",
+                //         style: Theme.of(context).textTheme.bodyLarge),
+                //     TextButton(
+                //       style: TextButton.styleFrom(
+                //           maximumSize: const Size(70, 29),
+                //           minimumSize: const Size(70, 29),
+                //           side: const BorderSide(
+                //             color: Colors.black,
+                //             width: 2.5,
+                //           )),
+                //       onPressed: () {
+                //         Navigator.of(context).push(
+                //           MaterialPageRoute(
+                //             builder: (context) => const SignInPage(),
+                //           ),
+                //         );
+                //       },
+                //       child: const Text(
+                //         'Sign in',
+                //         style: TextStyle(
+                //           fontSize: 12,
+                //           fontWeight: FontWeight.w700,
+                //           color: Colors.black,
+                //         ),
+                //       ),
+                //     )
+                //   ],
+                // ),
                 const Spacer(
                   flex: 5,
                 ),
@@ -134,20 +129,16 @@ class _LoginPageState extends State<LoginPage> {
                       )
                     : ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
+                          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                           minimumSize: const Size(double.infinity, 40),
                         ),
                         onPressed: () {
                           logIn(
                               email.text.trim(), password.text.trim(), context);
                         },
-                        child: const Text(
+                        child:  Text(
                           'Login ',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
+                          style: Theme.of(context).textTheme.headlineMedium
                         ),
                       ),
               ],

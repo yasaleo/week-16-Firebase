@@ -18,16 +18,10 @@ class Headline extends StatelessWidget {
         children: [
           Text(
             name,
-            style: const TextStyle(
-              fontWeight: FontWeight.w900,
-              color: Colors.black,
-              fontSize: 50,
-              letterSpacing: 9
-            ),
+            style: Theme.of(context).textTheme.displayLarge
           ),
           Divider(
             thickness: 3.8,
-            color: Colors.black,
             endIndent: endindent,
             indent: 6,
           )

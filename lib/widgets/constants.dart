@@ -10,10 +10,10 @@ loading(BuildContext context) {
     barrierColor: Colors.black12,
     context: context,
     builder: (context) {
-      return const Center(
+      return  Center(
         child: CircularProgressIndicator(
-          color: Colors.black,
-          strokeWidth: 7,
+          color: Theme.of(context).colorScheme.inversePrimary,
+          strokeWidth: 10,
         ),
       );
     },

@@ -18,8 +18,29 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-       
+        useMaterial3: true,
+        brightness: Brightness.light,
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 70),
+           displaySmall: TextStyle(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
+      darkTheme: ThemeData(
+          primarySwatch: Colors.blue,
+          useMaterial3: true,
+          brightness: Brightness.dark,
+          textTheme: const TextTheme(
+            displayLarge: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 70,
+            ),
+            displaySmall: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          )),
+      themeMode: ThemeMode.system,
       home: const SplashScreen(),
     );
   }

@@ -6,7 +6,7 @@ import 'package:firebase_week_16/widgets/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
-import '../personmodel/model.dart';
+import '../model/model.dart';
 import '../widgets/constants.dart';
 
 class FirebaseOperations {

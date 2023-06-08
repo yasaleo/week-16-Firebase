@@ -28,19 +28,15 @@ class _SplashScreenState extends State<SplashScreen> {
           padding: const EdgeInsets.only(left: 120),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children:  [
               Text(
                 'Firebase',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 5,
-                ),
+                style: Theme.of(context).textTheme.displaySmall,
               ),
               cheight20,
               cheight30,
-              CircularProgressIndicator(
-                color: Colors.black,
+               CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.inverseSurface,
                 strokeWidth: 10,
               )
             ],

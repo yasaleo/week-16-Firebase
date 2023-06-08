@@ -25,15 +25,14 @@ class CustomInputFeild extends StatelessWidget {
       obscureText: obscureText,
       decoration: InputDecoration(
         label: labell,
-        icon: Theme(
-          data: ThemeData(primaryColor: Colors.black),
-          child: widget,
-        ),
+        labelStyle: Theme.of(context).textTheme.bodyMedium,
+        icon: widget,
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(width: 3),
         ),
         hintText: hint,
+        hintStyle: Theme.of(context).textTheme.bodyMedium,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
