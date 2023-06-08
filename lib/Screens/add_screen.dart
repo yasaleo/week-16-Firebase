@@ -73,7 +73,7 @@ class _AddScreenState extends State<AddScreen> {
               //         uid: widget.uid!,
               //       );
               if (image != null) {
-              final bs64=  base64Encode(image!.readAsBytesSync());
+                final bs64 = base64Encode(image!.readAsBytesSync());
                 print(bs64);
               }
             },
@@ -88,12 +88,12 @@ class _AddScreenState extends State<AddScreen> {
             padding: const EdgeInsets.all(10.0),
             child: Column(
               children: [
-                image == null
-                    ? GestureDetector(
-                        onTap: () {
-                          pickimage();
-                        },
-                        child: CircleAvatar(
+                GestureDetector(
+                  onTap: () {
+                    showImageOptions(context);
+                  },
+                  child: image == null
+                      ? CircleAvatar(
                           maxRadius: 70,
                           backgroundColor:
                               Theme.of(context).colorScheme.onInverseSurface,
@@ -101,21 +101,22 @@ class _AddScreenState extends State<AddScreen> {
                             Icons.person_add,
                             size: 60,
                           ),
-                        ),
-                      )
-                    : Material(
-                        elevation: 10,
-                        shape: const CircleBorder(
-                          side: BorderSide(
-                            color: Colors.black,
-                            width: 5,
+                        )
+                      : Material(
+                          elevation: 10,
+                          shape: const CircleBorder(
+                            side: BorderSide(
+                              color: Colors.black,
+                              width: 5,
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            maxRadius: 70,
+                            backgroundImage: FileImage(image!),
                           ),
                         ),
-                        child: CircleAvatar(
-                          maxRadius: 70,
-                          backgroundImage: FileImage(image!),
-                        ),
-                      ),
+                ),
+
                 cheight30,
                 CustomInputFeild(
                   controller: name,
@@ -166,9 +167,58 @@ class _AddScreenState extends State<AddScreen> {
     );
   }
 
-  Future pickimage() async {
+  Future<dynamic> showImageOptions(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          height: 200,
+          width: double.infinity,
+          color: Theme.of(context).colorScheme.background,
+          child: Column(
+            children: [
+              cheight30,
+              OutlinedButton(
+                onPressed: () {
+                  pickimageFromcamera();
+                },
+                child: Text(
+                  "Camera",
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ),
+              cheight20,
+              OutlinedButton(
+                onPressed: () {
+                  pickimageFromGallery();
+                },
+                child: Text(
+                  "gallery",
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future pickimageFromGallery() async {
     final imagepath =
         await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (imagepath == null) {
+      return;
+    } else {
+      final img = File(imagepath.path);
+      setState(() {
+        image = img;
+      });
+    }
+  }
+
+  Future pickimageFromcamera() async {
+    final imagepath = await ImagePicker().pickImage(source: ImageSource.camera);
     if (imagepath == null) {
       return;
     } else {
